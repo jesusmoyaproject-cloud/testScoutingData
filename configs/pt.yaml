@@ -1,0 +1,43 @@
+# Perfil para ejecución con PyTorch (.pt) en GPU NVIDIA / Colab
+name: pt
+model_format: pt
+device: 0                   # 0 = primera GPU CUDA; "cpu" para CPU
+
+# Variables principales (se pueden sobreescribir con --video y --model en CLI)
+video: "/content/partido.mp4"
+output_dir: "outputs/pt"
+
+models:
+  ball: "/content/models/ball/best.pt"
+  player: "/content/models/player/best.pt"
+  homography: "/content/models/homography/best.pt"
+
+inference:
+  imgsz: 1280
+  conf: 0.25
+  max_frames: null          # null para todo el video
+  frame_stride: 1
+  write_raw_video: false
+  log_interval: 50
+
+ball:
+  class_id: 0
+  run_postprocess: true
+  postprocess:
+    high_conf: 0.45
+    low_conf: 0.20
+    nms_dist_px: 20.0
+    max_link_gap: 4
+    base_gate_px: 25.0
+    max_speed_px: 25.0
+    static_min_frames: 15
+    static_max_disp_px: 12.0
+    max_interp_gap: 75
+    max_tail_extrap: 5
+    render_video: false
+
+player:
+  classes: [0]
+
+homography:
+  conf: 0.25

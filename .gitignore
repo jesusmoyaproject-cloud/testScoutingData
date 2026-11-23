@@ -1,0 +1,24 @@
+# OS / Google Drive
+desktop.ini
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Videos, salidas y datasets pesados
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.csv
+outputs/
+
+# Pesos de modelos
+*.pt
+*.onnx
+*.engine
+*_openvino_model/

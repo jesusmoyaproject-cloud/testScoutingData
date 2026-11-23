@@ -1,0 +1,43 @@
+# Perfil para ejecución local con Intel OpenVINO (CPU / iGPU / NPU)
+name: openvino
+model_format: openvino
+device: "intel:gpu"         # Opciones: "intel:gpu", "intel:npu", "intel:cpu"
+
+# Variables principales (se pueden sobreescribir con --video y --model en CLI)
+video: "G:/Mi unidad/ScoutingData/videosPartidos/ccVSutc_liga1max_2026_clausura_st.mp4"
+output_dir: "outputs/openvino"
+
+models:
+  ball: "G:/Mi unidad/ScoutingData/modelos/OpenVino/yolov11m-ball_openvino_model"
+  player: "G:/Mi unidad/ScoutingData/modelos/OpenVino/player_openvino_model"
+  homography: "G:/Mi unidad/ScoutingData/modelos/OpenVino/homography_openvino_model"
+
+inference:
+  imgsz: 1280
+  conf: 0.25
+  max_frames: 5000          # null para procesar todo el video
+  frame_stride: 1
+  write_raw_video: false
+  log_interval: 20
+
+ball:
+  class_id: 0
+  run_postprocess: true
+  postprocess:
+    high_conf: 0.45
+    low_conf: 0.20
+    nms_dist_px: 20.0
+    max_link_gap: 4
+    base_gate_px: 25.0
+    max_speed_px: 25.0
+    static_min_frames: 15
+    static_max_disp_px: 12.0
+    max_interp_gap: 75
+    max_tail_extrap: 5
+    render_video: true
+
+player:
+  classes: [0]              # Ajustar según IDs de clase de tu modelo de jugadores
+
+homography:
+  conf: 0.25
