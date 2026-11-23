@@ -34,7 +34,7 @@ ball:
     static_max_disp_px: 12.0
     max_interp_gap: 75
     max_tail_extrap: 5
-    render_video: false
+    render_video: true
 
 player:
   classes: [0]
