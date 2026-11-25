@@ -17,8 +17,9 @@ def run_player_inference(cfg: dict[str, Any]) -> dict[str, Any]:
     player_cfg = cfg.get("player", {})
 
     classes = player_cfg.get("classes")
+    exclude_classes = {int(c) for c in player_cfg.get("exclude_classes", [])}
     imgsz = int(inf_cfg.get("imgsz", 1280))
-    conf_thresh = float(inf_cfg.get("conf", 0.25))
+    conf_thresh = float(player_cfg.get("conf", inf_cfg.get("conf", 0.25)))
     max_frames = inf_cfg.get("max_frames")
     stride = int(inf_cfg.get("frame_stride", 1))
     write_video = bool(inf_cfg.get("write_raw_video", False))
@@ -61,6 +62,8 @@ def run_player_inference(cfg: dict[str, Any]) -> dict[str, Any]:
 
                 for i, (x1, y1, x2, y2) in enumerate(detections.xyxy):
                     cls_id = int(detections.class_id[i]) if detections.class_id is not None else -1
+                    if cls_id in exclude_classes:
+                        continue
                     conf = float(detections.confidence[i]) if detections.confidence is not None else 0.0
                     writer.writerow([
                         frame_idx, cls_id, f"{conf:.4f}",

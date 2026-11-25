@@ -9,7 +9,7 @@ output_dir: "outputs/openvino"
 
 models:
   ball: "G:/Mi unidad/ScoutingData/modelos/OpenVino/yolov11m-ball_openvino_model"
-  player: "G:/Mi unidad/ScoutingData/modelos/OpenVino/player_openvino_model"
+  player: "G:/Mi unidad/ScoutingData/modelos/OpenVino/yolov11m-player_openvino_model"
   homography: "G:/Mi unidad/ScoutingData/modelos/OpenVino/homography_openvino_model"
 
 inference:
@@ -37,7 +37,26 @@ ball:
     render_video: true
 
 player:
-  classes: [0]              # Ajustar según IDs de clase de tu modelo de jugadores
+  classes: [1, 2, 3]        # 1: goalkeeper, 2: player, 3: referee (excluye 0: ball)
+  exclude_classes: [0]
+  conf: 0.20                # Umbral bajo para pasada 1; el postproceso filtra y rescata
+  run_postprocess: true
+  postprocess:
+    high_conf: 0.45
+    low_conf: 0.20
+    nms_dist_px: 20.0
+    nms_iou_thresh: 0.70
+    max_link_gap: 6
+    base_gate_px: 25.0
+    max_speed_px: 8.0
+    max_stitch_gap: 35
+    max_stitch_dist_px: 120.0
+    min_track_frames: 3
+    static_min_frames: 45
+    static_max_disp_px: 8.0
+    max_interp_gap: 35
+    max_tail_extrap: 0
+    render_video: true
 
 homography:
   conf: 0.25

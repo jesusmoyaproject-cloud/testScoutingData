@@ -5,6 +5,7 @@ from common.config_loader import load_config
 from ball.infer import run_ball_inference
 from ball.postprocess import run_ball_postprocess
 from player.infer import run_player_inference
+from player.postprocess import run_player_postprocess
 from homography.infer import run_homography_inference
 
 
@@ -43,6 +44,9 @@ def main() -> None:
             metrics["postprocess"] = pp_metrics
     elif args.task == "player":
         metrics = run_player_inference(cfg)
+        if cfg.get("player", {}).get("run_postprocess", True):
+            pp_metrics = run_player_postprocess(cfg, Path(metrics["csv_player"]))
+            metrics["postprocess"] = pp_metrics
     else:
         metrics = run_homography_inference(cfg)
 

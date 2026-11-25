@@ -40,10 +40,12 @@ class ThreadedOpenCVReader:
                     except queue.Full:
                         continue
             frame_idx += 1
-        try:
-            self.queue.put(None, timeout=0.1)
-        except queue.Full:
-            pass
+        while not self._stop_event.is_set():
+            try:
+                self.queue.put(None, timeout=0.1)
+                break
+            except queue.Full:
+                continue
 
     def __iter__(self):
         return self
