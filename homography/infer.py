@@ -85,6 +85,7 @@ def run_homography_inference(cfg: dict[str, Any]) -> dict[str, Any]:
             max_hold_frames=max_hold_frames,
             h_ema_alpha=h_ema_alpha,
             kpt_ema_alpha=kpt_ema_alpha,
+            frame_stride=stride,
         )
         if stabilize
         else None
@@ -286,9 +287,15 @@ def run_homography_inference(cfg: dict[str, Any]) -> dict[str, Any]:
     # --- Renderizado final del video ---
     if write_video:
         print(f"[HOMOGRAPHY] Renderizando video final en {video_output}...", flush=True)
+        out_video_info = sv.VideoInfo(
+            width=video_info.width,
+            height=video_info.height,
+            fps=max(1, round(video_info.fps / stride)) if video_info.fps else 30,
+            total_frames=video_info.total_frames,
+        )
         by_frame_idx = {fd["frame_idx"]: fd for fd in frames_data}
         with ThreadedOpenCVReader(video_path, max_frames=max_frames, stride=stride) as reader, sv.VideoSink(
-            str(video_output), video_info=video_info
+            str(video_output), video_info=out_video_info
         ) as sink:
             for frame_idx, frame in reader:
                 fd = by_frame_idx.get(frame_idx)

@@ -11,6 +11,7 @@ def load_config(
     output_dir_override: str | None = None,
     max_frames_override: int | None = None,
     device_override: str | None = None,
+    frame_stride_override: int | None = None,
 ) -> dict[str, Any]:
     """Carga un YAML de configuración y aplica overrides recibidos por CLI."""
     with open(config_path, mode="r", encoding="utf-8") as f:
@@ -39,6 +40,8 @@ def load_config(
     inf = cfg.setdefault("inference", {})
     if max_frames_override is not None:
         inf["max_frames"] = None if max_frames_override < 0 else max_frames_override
+    if frame_stride_override is not None:
+        inf["frame_stride"] = max(1, frame_stride_override)
     if device_override is not None:
         cfg["device"] = int(device_override) if device_override.isdigit() else device_override
 

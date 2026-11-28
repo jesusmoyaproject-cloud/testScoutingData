@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=None, help="Sobreescribe la ruta del modelo definida en el YAML")
     parser.add_argument("--output-dir", default=None, help="Sobreescribe el directorio de salida")
     parser.add_argument("--max-frames", type=int, default=None, help="Límite de frames (-1 para procesar todo el video)")
+    parser.add_argument("--frame-stride", "--stride", dest="frame_stride", type=int, default=None, help="Procesar cada N frames (1 = todos)")
     parser.add_argument("--device", default=None, help="Sobreescribe device (ej. 0, cpu, intel:gpu)")
     return parser.parse_args()
 
@@ -31,6 +32,7 @@ def main() -> None:
         output_dir_override=args.output_dir,
         max_frames_override=args.max_frames,
         device_override=args.device,
+        frame_stride_override=args.frame_stride,
     )
 
     print(f"=== Ejecutando task='{args.task}' | profile='{cfg.get('name')}' | device='{cfg.get('device')}' ===")

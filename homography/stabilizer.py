@@ -96,6 +96,7 @@ class HomographyStabilizer:
         kpt_ema_alpha: float = 0.45,
         max_h_center_jump_m: float = 12.0,
         scene_cut_diff_thresh: float = 35.0,
+        frame_stride: int = 1,
     ) -> None:
         self.max_jump_px = max_jump_px
         self.max_geom_err_m = max_geom_err_m
@@ -107,6 +108,7 @@ class HomographyStabilizer:
         self.kpt_ema_alpha = kpt_ema_alpha
         self.max_h_center_jump_m = max_h_center_jump_m
         self.scene_cut_diff_thresh = scene_cut_diff_thresh
+        self.frame_stride = max(1, frame_stride)
 
         self._tracks: dict[int, _KptTrackState] = {}
         self._prev_gray_small: np.ndarray | None = None
@@ -152,7 +154,8 @@ class HomographyStabilizer:
         active_records: list[dict[str, Any]] = []
         outlier_records: list[dict[str, Any]] = []
 
-        h_recent = self._smooth_h is not None and self._last_h_frame is not None and (frame_idx - self._last_h_frame) <= 5
+        h_recent_gap = max(5, 2 * self.frame_stride)
+        h_recent = self._smooth_h is not None and self._last_h_frame is not None and (frame_idx - self._last_h_frame) <= h_recent_gap
 
         for rec in raw_records:
             kpt_id = int(rec["keypoint_idx"])
@@ -176,11 +179,12 @@ class HomographyStabilizer:
             prev = self._tracks.get(kpt_id)
             if prev is not None:
                 dt = max(1, frame_idx - prev.last_frame)
-                if dt <= 8:
-                    pred_x = prev.x_px + prev.vx_px * min(dt, 2)
-                    pred_y = prev.y_px + prev.vy_px * min(dt, 2)
+                if dt <= max(8, 3 * self.frame_stride):
+                    step_dt = dt / self.frame_stride
+                    pred_x = prev.x_px + prev.vx_px * min(dt, 2 * self.frame_stride)
+                    pred_y = prev.y_px + prev.vy_px * min(dt, 2 * self.frame_stride)
                     jump = float(np.hypot(raw_x - pred_x, raw_y - pred_y))
-                    allowed_jump = self.max_jump_px * (1.0 + 0.35 * (dt - 1))
+                    allowed_jump = self.max_jump_px * (1.0 + 0.35 * max(0.0, step_dt - 1.0))
                     if jump > allowed_jump:
                         rec["is_outlier"] = True
                         rec["source"] = "rejected_jump"
